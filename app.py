@@ -1,35 +1,58 @@
-import streamlit as st
 from google import genai
-import json
-import os
+import streamlit as st
 
-st.set_page_config(page_title="المكتبة الرقمية للتراث الثقافي", layout="centered")
+# إعدادات صفحة ستريمليت
+st.set_page_config(
+    page_title="المكتبة التراثية الرقمية", page_icon="🏛️", layout="centered"
+)
 
-# الاتصال بالذكاء الاصطناعي باستخدام المفتاح السري المرفوع في الإعدادات
-client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
+st.title("🏛️ المكتبة التراثية الرقمية")
+st.write(
+    "مرحباً بك! هذا التطبيق مخصص للإجابة عن كل ما يتعلق بالتراث، التاريخ،"
+    " والثقافة."
+)
 
-st.title("🏛️ المكتبة الرقمية للتراث الثقافي السعودي")
-st.write("منصة ذكاء اصطناعي لاستكشاف وتوثيق التراث الأصيل.")
+# التحقق من مفتاح الـ API من إعدادات Secrets في ستريمليت
+try:
+  api_key = st.secrets["GEMINI_API_KEY"]
+  client = genai.Client(api_key=api_key)
+except Exception:
+  st.error(
+      "الرجاء إضافة مفتاح `GEMINI_API_KEY` في قسم Secrets في إعدادات ستريمليت."
+  )
+  st.stop()
 
-# قراءة ملف البيانات الخارجي تلقائياً
-heritage_context = ""
-if os.path.exists("heritage.json"):
-    with open("heritage.json", "r", encoding="utf-8") as f:
-        heritage_context = f.read()
+# إدارة المحادثة (Chat History)
+if "messages" not in st.session_state:
+  st.session_state.messages = []
 
-user_question = st.text_input("🔍 اسأل عن أي موروث ثقافي:")
+# عرض الرسائل السابقة
+for message in st.session_state.messages:
+  with st.chat_message(message["role"]):
+    st.markdown(message["content"])
 
-if user_question:
-    with st.spinner("جاري البحث وصياغة الإجابة..."):
-        prompt = f"""
-        أنت خبير ومرشد ثقافي في المكتبة الرقمية للتراث السعودي.
-        أجب عن سؤال المستخدم بأسلوب شيق، دقيق، ومختصر باللغة العربية.
-        اعتمد في إجابتك أولاً على هذه البيانات الموثقة إن وجدت: {heritage_context}
-        سؤال المستخدم: {user_question}
-        """
+# استقبال إدخال المستخدم
+if prompt := st.chat_input("اكتب سؤالك أو استفسارك التراثي هنا..."):
+  st.session_state.messages.append({"role": "user", "content": prompt})
+  with st.chat_message("user"):
+    st.markdown(prompt)
+
+  # توليد الرد باستخدام نموذج جيميني
+  with st.chat_message("assistant"):
+    with st.spinner("جاري البحث في الذاكرة التراثية..."):
+      try:
         response = client.models.generate_content(
             model="gemini-2.5-flash",
-            contents=prompt,
+            contents=(
+                "أنت مساعد ذكي متخصص في التراث والثقافة والتاريخ. أجب عن السؤال"
+                f" التالي باحترافية: {prompt}"
+            ),
         )
-        st.success("🤖 إجابة المساعد الثقافي:")
-        st.write(response.text)
+        answer = response.text
+        st.markdown(answer)
+        st.session_state.messages.append(
+            {"role": "assistant", "content": answer}
+        )
+      except Exception as e:
+        st.error(f"حدث خطأ أثناء الاتصال بالذكاء الاصطناعي: {e}")
+    
