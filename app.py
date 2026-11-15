@@ -37,11 +37,11 @@ if prompt := st.chat_input("اكتب سؤالك أو استفسارك الترا
   with st.chat_message("user"):
     st.markdown(prompt)
 
-  # توليد الرد بشكل فوري وسريع باستخدام نموذج مستقر
+  # توليد الرد بشكل فوري وسريع
   with st.chat_message("assistant"):
     try:
       response_stream = client.models.generate_content_stream(
-          model="gemini-1.5-flash",
+          model="gemini-3.8-flash",
           contents=(
               "أنت مساعد ذكي متخصص في التراث والثقافة والتاريخ. أجب عن السؤال"
               f" التالي باحترافية: {prompt}"
@@ -62,5 +62,8 @@ if prompt := st.chat_input("اكتب سؤالك أو استفسارك الترا
           {"role": "assistant", "content": full_response}
       )
 
-    except Exception as e:
-      st.error(f"حدث خطأ أثناء الاتصال بالذكاء الاصطناعي: {e}")
+    except Exception:
+      st.warning(
+          "⚠️ الخوادم تواجه ضغطاً مؤقتاً الآن. يرجى إعادة إرسال السؤال بعد ثوانٍ"
+          " قليلة."
+      )
