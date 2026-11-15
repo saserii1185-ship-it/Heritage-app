@@ -20,11 +20,14 @@ if "GEMINI_API_KEY" not in st.secrets:
       "الرجاء إضافة `GEMINI_API_KEY` في قسم الـ Secrets في إعدادات التطبيق."
   )
 else:
-  api_key = st.secrets["GEMINI_API_KEY"]
+  token = st.secrets["GEMINI_API_KEY"]
 
-  # إرسال المفتاح بالطريقة الصحيحة عبر الـ Query Parameter في الرابط
-  url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
-  headers = {"Content-Type": "application/json"}
+  # رابط الاتصال المباشر للنموذج (بدون key= لأننا نستخدم Bearer Token)
+  url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+  headers = {
+      "Authorization": f"Bearer {token}",
+      "Content-Type": "application/json",
+  }
 
   # إدارة سجل المحادثة
   if "messages" not in st.session_state:
