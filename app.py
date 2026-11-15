@@ -3,13 +3,13 @@ import streamlit as st
 
 # إعدادات صفحة ستريمليت
 st.set_page_config(
-    page_title="المكتبة التراثية الرقمية", page_icon="🏛️", layout="centered"
+    page_title="المساعد الذكي الشامل", page_icon="🤖", layout="centered"
 )
 
-st.title("🏛️ المكتبة التراثية الرقمية")
+st.title("🤖 المساعد الذكي الشامل")
 st.write(
-    "مرحباً بك! هذا التطبيق مخصص للإجابة عن كل ما يتعلق بالتراث، التاريخ،"
-    " والثقافة."
+    "مرحباً بك! أنا مساعدك الذكي الجاهز للإجابة عن أي سؤال، نقاش، أو استفسار في"
+    " شتى المجالات."
 )
 
 # التحقق من مفتاح الـ API
@@ -30,28 +30,35 @@ for message in st.session_state.messages:
     st.markdown(message["content"])
 
 # استقبال إدخال المستخدم
-if prompt := st.chat_input("اكتب سؤالك أو استفسارك التراثي هنا..."):
+if prompt := st.chat_input("اكتب أي شيء في بالك..."):
   st.session_state.messages.append({"role": "user", "content": prompt})
   with st.chat_message("user"):
     st.markdown(prompt)
 
-  # توليد الرد باستخدام النموذج الصحيح المخصص لحسابك
+  # توليد الرد بشكل فوري وسريع لجميع الأسئلة
   with st.chat_message("assistant"):
-    with st.spinner("جاري البحث في الذاكرة التراثية..."):
-      try:
-        response = client.models.generate_content(
-            model="gemini-3.8-flash",
-            contents=(
-                "أنت مساعد ذكي متخصص في التراث والثقافة والتاريخ. أجب باحترافية"
-                f" عن: {prompt}"
-            ),
-        )
-        answer = response.text
-        st.markdown(answer)
-        st.session_state.messages.append(
-            {"role": "assistant", "content": answer}
-        )
-      except Exception as e:
-        st.error(
-            "⚠️ الخوادم تواجه ضغطاً مؤقتاً، جربي إعادة إرسال السؤال بعد ثانية."
-        )
+    try:
+      response_stream = client.models.generate_content_stream(
+          model="gemini-3.8-flash",
+          contents=(
+              "أنت مساعد ذكي متعدد الاستخدامات، ودود ومفيد، تجيب على أي سؤال"
+              f" أو طلب يطرحه المستخدم باحترافية وسلاسة: {prompt}"
+          ),
+      )
+
+
+      # دالة لعرض الكلمات فور توليدها
+      def stream_generator():
+        for chunk in response_stream:
+          if chunk.text:
+            yield chunk.text
+
+
+      # عرض الرد وتخزين النص الكامل تلقائياً
+      full_response = st.write_stream(stream_generator())
+      st.session_state.messages.append(
+          {"role": "assistant", "content": full_response}
+      )
+
+    except Exception as e:
+      st.error(f"حدث خطأ أثناء الاتصال: {e}")
