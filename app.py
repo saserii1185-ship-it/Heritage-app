@@ -37,11 +37,11 @@ if prompt := st.chat_input("اكتب سؤالك أو استفسارك الترا
   with st.chat_message("user"):
     st.markdown(prompt)
 
-  # توليد الرد بشكل فوري وسريع باستخدام Streaming
+  # توليد الرد بشكل فوري وسريع باستخدام نموذج مستقر
   with st.chat_message("assistant"):
     try:
       response_stream = client.models.generate_content_stream(
-          model="gemini-3.8-flash",
+          model="gemini-1.5-flash",
           contents=(
               "أنت مساعد ذكي متخصص في التراث والثقافة والتاريخ. أجب عن السؤال"
               f" التالي باحترافية: {prompt}"
