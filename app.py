@@ -42,7 +42,7 @@ if prompt := st.chat_input("اكتب سؤالك أو استفسارك الترا
     with st.spinner("جاري البحث في الذاكرة التراثية..."):
       try:
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-3.8-flash",
             contents=(
                 "أنت مساعد ذكي متخصص في التراث والثقافة والتاريخ. أجب عن السؤال"
                 f" التالي باحترافية: {prompt}"
