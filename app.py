@@ -37,19 +37,15 @@ if prompt := st.chat_input(
   with st.chat_message("user"):
     st.markdown(prompt)
 
-  # توليد الرد بشكل فوري مع تقييد طول النص ليكون سريعاً جداً
+  # توليد الرد بشكل فوري وسريع
   with st.chat_message("assistant"):
     try:
       response_stream = client.models.generate_content_stream(
           model="gemini-3.8-flash",
           contents=(
-              "أنت مساعد ذكي وخبير حصرياً في تراث وثقافة نجد. أجب بإيجاز"
-              " وتركيز شديد ومباشر عن الكلمة أو السؤال التالي بدون إطالة أو"
-              f" تفاصيل مفرطة: {prompt}"
+              "أنت مساعد ذكي وخبير في تراث وثقافة نجد. أجب باستفاضة معتدلة وبشكل"
+              f" مباشر عن السؤال أو الكلمة التالية: {prompt}"
           ),
-          config={
-              "max_output_tokens": 300
-          },  # هذا السطر يجبر النموذج على الاختصار وسرعة الرد
       )
 
 
