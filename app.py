@@ -37,33 +37,23 @@ if prompt := st.chat_input("اكتب سؤالك أو استفسارك الترا
   with st.chat_message("user"):
     st.markdown(prompt)
 
-  # توليد الرد بشكل فوري وسريع
+  # توليد الرد بالطريقة المستقرة المضمونة
   with st.chat_message("assistant"):
-    try:
-      response_stream = client.models.generate_content_stream(
-          model="gemini-3.8-flash",
-          contents=(
-              "أنت مساعد ذكي متخصص في التراث والثقافة والتاريخ. أجب عن السؤال"
-              f" التالي باحترافية: {prompt}"
-          ),
-      )
-
-
-      # دالة لعرض الكلمات فور توليدها
-      def stream_generator():
-        for chunk in response_stream:
-          if chunk.text:
-            yield chunk.text
-
-
-      # عرض الرد وتخزين النص الكامل تلقائياً
-      full_response = st.write_stream(stream_generator())
-      st.session_state.messages.append(
-          {"role": "assistant", "content": full_response}
-      )
-
-    except Exception:
-      st.warning(
-          "⚠️ الخوادم تواجه ضغطاً مؤقتاً الآن. يرجى إعادة إرسال السؤال بعد ثوانٍ"
-          " قليلة."
-      )
+    with st.spinner("جاري البحث في الذاكرة التراثية..."):
+      try:
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=(
+                "أنت مساعد ذكي متخصص في التراث والثقافة والتاريخ. أجب باحترافية"
+                f" عن: {prompt}"
+            ),
+        )
+        answer = response.text
+        st.markdown(answer)
+        st.session_state.messages.append(
+            {"role": "assistant", "content": answer}
+        )
+      except Exception as e:
+        st.error(
+            "حدث خطأ بسيط في الاتصال، جربي إرسال السؤال مرة أخرى بعد ثوانٍ."
+        )
