@@ -42,7 +42,7 @@ if prompt := st.chat_input("اكتب سؤالك أو استفسارك الترا
     with st.spinner("جاري البحث في الذاكرة التراثية..."):
       try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.0-flash",
             contents=(
                 "أنت مساعد ذكي متخصص في التراث والثقافة والتاريخ. أجب عن السؤال"
                 f" التالي باحترافية: {prompt}"
@@ -55,4 +55,3 @@ if prompt := st.chat_input("اكتب سؤالك أو استفسارك الترا
         )
       except Exception as e:
         st.error(f"حدث خطأ أثناء الاتصال بالذكاء الاصطناعي: {e}")
-    
