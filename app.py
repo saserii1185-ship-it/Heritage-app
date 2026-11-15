@@ -12,14 +12,12 @@ st.write(
     " والثقافة."
 )
 
-# التحقق من مفتاح الـ API من إعدادات Secrets في ستريمليت
+# التحقق من مفتاح الـ API
 try:
   api_key = st.secrets["GEMINI_API_KEY"]
   client = genai.Client(api_key=api_key)
-except Exception:
-  st.error(
-      "الرجاء إضافة مفتاح `GEMINI_API_KEY` في قسم Secrets في إعدادات ستريمليت."
-  )
+except Exception as e:
+  st.error(f"خطأ في إعداد مفتاح الـ API: {e}")
   st.stop()
 
 # إدارة المحادثة (Chat History)
@@ -37,12 +35,12 @@ if prompt := st.chat_input("اكتب سؤالك أو استفسارك الترا
   with st.chat_message("user"):
     st.markdown(prompt)
 
-  # توليد الرد بالطريقة المستقرة المضمونة
+  # توليد الرد مع إظهار الخطأ الحقيقي في حال حدثت مشكلة
   with st.chat_message("assistant"):
-    with st.spinner("جاري البحث في الذاكرة التراثية..."):
+    with st.spinner("جاري المعالجة..."):
       try:
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-1.5-flash",
             contents=(
                 "أنت مساعد ذكي متخصص في التراث والثقافة والتاريخ. أجب باحترافية"
                 f" عن: {prompt}"
@@ -54,6 +52,5 @@ if prompt := st.chat_input("اكتب سؤالك أو استفسارك الترا
             {"role": "assistant", "content": answer}
         )
       except Exception as e:
-        st.error(
-            "حدث خطأ بسيط في الاتصال، جربي إرسال السؤال مرة أخرى بعد ثوانٍ."
-        )
+        # هنا سيظهر الخطأ التقني الحقيقي لنعرف سببه بدقة
+        st.error(f"⚠️ الإيرور التقني بالتفصيل: {e}")
