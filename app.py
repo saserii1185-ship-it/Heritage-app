@@ -3,13 +3,13 @@ import streamlit as st
 
 # إعدادات صفحة ستريمليت
 st.set_page_config(
-    page_title="موسوعة التراث النجدي", page_icon="🏜️", layout="centered"
+    page_title="المساعد الثقافي والتراثي", page_icon="🏛️", layout="centered"
 )
 
-st.title("🏜️ موسوعة التراث وثقافة نجد")
+st.title("🏛️ المساعد الثقافي والتراثي")
 st.write(
-    "مرحباً بكِ! هذا التطبيق مخصص حصرياً للإجابة عن تراث، تاريخ، عادات، فنون،"
-    " وثقافة منطقة نجد العريقة."
+    "مرحباً بكِ! أنا مساعدك الذكي الجاهز للحديث معكِ بكل ود ومرونة عن أي"
+    " معلومة ثقافية أو تراثية تطلبينها."
 )
 
 # التحقق من مفتاح الـ API
@@ -30,37 +30,28 @@ for message in st.session_state.messages:
     st.markdown(message["content"])
 
 # استقبال إدخال المستخدم
-if prompt := st.chat_input(
-    "اكتب استفسارك عن تراث وثقافة نجد (مثل: العرضة، البناء، الملابس التقليدية)..."
-):
+if prompt := st.chat_input("اكتبي لي أي استفسار ثقافي أو تراثي..."):
   st.session_state.messages.append({"role": "user", "content": prompt})
   with st.chat_message("user"):
     st.markdown(prompt)
 
-  # توليد الرد بشكل فوري وسريع
+  # توليد الرد بطريقة ودية وطبيعية تماماً مثل المحادثة
   with st.chat_message("assistant"):
-    try:
-      response_stream = client.models.generate_content_stream(
-          model="gemini-3.8-flash",
-          contents=(
-              "أنت مساعد ذكي وخبير في تراث وثقافة نجد. أجب باستفاضة معتدلة وبشكل"
-              f" مباشر عن السؤال أو الكلمة التالية: {prompt}"
-          ),
-      )
-
-
-      def stream_generator():
-        for chunk in response_stream:
-          if hasattr(chunk, "text") and chunk.text:
-            yield chunk.text
-
-
-      full_response = st.write_stream(stream_generator())
-      if not full_response:
-        full_response = "أهلاً بكِ! تفضلي بطرح سؤالك حول تراث نجد."
-      st.session_state.messages.append(
-          {"role": "assistant", "content": full_response}
-      )
-
-    except Exception as e:
-      st.error(f"حدث خطأ أثناء الاتصال: {e}")
+    with st.spinner("جاري التفكير..."):
+      try:
+        response = client.models.generate_content(
+            model="gemini-3.8-flash",
+            contents=(
+                "أنت مساعد ذكي يتحدث بطريقة ودية، طبيعية، ومرنة تماماً مثل"
+                " المحادثة البشرية، ومتخصص في تقديم المعلومات الثقافية والتراثية"
+                " (مع التركيز على تراث وثقافة نجد وكل ما تطلبه المستخدمة)."
+                f" أجب بطريقة جذابة ومباشرة عن: {prompt}"
+            ),
+        )
+        answer = response.text
+        st.markdown(answer)
+        st.session_state.messages.append(
+            {"role": "assistant", "content": answer}
+        )
+      except Exception as e:
+        st.error(f"حدث خطأ أثناء الاتصال: {e}")
