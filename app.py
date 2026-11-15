@@ -1,4 +1,3 @@
-import time
 from google import genai
 import streamlit as st
 
@@ -38,51 +37,34 @@ if prompt := st.chat_input(
   with st.chat_message("user"):
     st.markdown(prompt)
 
-  # توليد الرد مع نظام إعادة المحاولة التلقائية للتعامل مع ضغط الخوادم (503)
+  # توليد الرد بشكل فوري مع تقييد طول النص ليكون سريعاً جداً
   with st.chat_message("assistant"):
-    success = False
-    full_response = ""
-
-    for attempt in range(3):
-      try:
-        response_stream = client.models.generate_content_stream(
-            model="gemini-3.8-flash",
-            contents=(
-                "أنت مساعد ذكي وخبير حصرياً في تراث وثقافة وتاريخ وعادات منطقة"
-                " نجد في المملكة العربية السعودية. أجب باحترافية وتفصيل عن السؤال"
-                f" التالي ضمن هذا النطاق: {prompt}"
-            ),
-        )
-
-
-        def stream_generator():
-          for chunk in response_stream:
-            if hasattr(chunk, "text") and chunk.text:
-              yield chunk.text
+    try:
+      response_stream = client.models.generate_content_stream(
+          model="gemini-3.8-flash",
+          contents=(
+              "أنت مساعد ذكي وخبير حصرياً في تراث وثقافة نجد. أجب بإيجاز"
+              " وتركيز شديد ومباشر عن الكلمة أو السؤال التالي بدون إطالة أو"
+              f" تفاصيل مفرطة: {prompt}"
+          ),
+          config={
+              "max_output_tokens": 300
+          },  # هذا السطر يجبر النموذج على الاختصار وسرعة الرد
+      )
 
 
-        full_response = st.write_stream(stream_generator())
-        success = True
-        break
-      except Exception as e:
-        # إذا كان الخطأ بسبب الضغط (503)، نحاول مرة أخرى تلقائياً
-        if ("503" in str(e) or "UNAVAILABLE" in str(e)) and attempt < 2:
-          time.sleep(1)
-          continue
-        else:
-          success = False
-          break
+      def stream_generator():
+        for chunk in response_stream:
+          if hasattr(chunk, "text") and chunk.text:
+            yield chunk.text
 
-    if success and full_response:
+
+      full_response = st.write_stream(stream_generator())
+      if not full_response:
+        full_response = "أهلاً بكِ! تفضلي بطرح سؤالك حول تراث نجد."
       st.session_state.messages.append(
           {"role": "assistant", "content": full_response}
       )
-    else:
-      error_msg = (
-          "⚠️ الخوادم تواجه ضغطاً مؤقتاً الآن (خطأ 503). يرجى إعادة إرسال"
-          " السؤال بعد ثوانٍ قليلة وسيعمل فوراً."
-      )
-      st.error(error_msg)
-      st.session_state.messages.append(
-          {"role": "assistant", "content": error_msg}
-      )
+
+    except Exception as e:
+      st.error(f"حدث خطأ أثناء الاتصال: {e}")
