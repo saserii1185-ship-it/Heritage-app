@@ -1,37 +1,35 @@
 import streamlit as st
+from google import genai
+import json
+import os
 
 st.set_page_config(page_title="المكتبة الرقمية للتراث الثقافي", layout="centered")
+
+# الاتصال بالذكاء الاصطناعي باستخدام المفتاح السري المرفوع في الإعدادات
+client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
 st.title("🏛️ المكتبة الرقمية للتراث الثقافي السعودي")
 st.write("منصة ذكاء اصطناعي لاستكشاف وتوثيق التراث الأصيل.")
 
-heritage_db = {
-    "القط العسيري": "القط العسيري هو فن نقش تقليدي تقوم به النساء لتزيين جدران المنازل الداخلية في منطقة عسير، وقد تم إدراجه في القائمة التمثيلية للتراث الثقافي غير المادي لمنظمة اليونسكو.",
-    "التراث النجدي": "يتميز التراث النجدي بالعمارة الطينية الأصيلة ذات الزخارف الجصية والنقوش الهندسية المثلثة (الفرجات)، بالإضافة إلى الأزياء التقليدية العريقة مثل الثوب النجدي (المسرح) والدقلة والمجند.",
-    "السدو": "السدو هو فن حياكة وتطريز تقليدي يستخدم لصناعة الخيام والوسائد البدوية باستخدام صوف الأغنام.",
-    "العرضة السعودية": "رقصة شعبية تقليدية نشأت في نجد وتمثل إحدى أهم أشكال التعبير عن الفخر والاحتفاء بالمناسبات الوطنية."
-}
+# قراءة ملف البيانات الخارجي تلقائياً
+heritage_context = ""
+if os.path.exists("heritage.json"):
+    with open("heritage.json", "r", encoding="utf-8") as f:
+        heritage_context = f.read()
 
-search_query = st.text_input("🔍 ابحث في المكتبة الرقمية عن أي عنصر تراثي (مثلاً: التراث النجدي أو القط العسيري):")
+user_question = st.text_input("🔍 اسأل عن أي موروث ثقافي:")
 
-if search_query:
-    found = False
-    for item, description in heritage_db.items():
-        if item in search_query or search_query in item:
-            st.success(f"**تم العثور على نتائج لـ ({item}):**")
-            st.write(description)
-            found = True
-            st.info(f"🤖 **رد الذكاء الاصطناعي الثقافي:** بناءً على مكتبتنا الرقمية، يُعد {item} ركيزة أساسية من هويتنا الثقافية.")
-            break
-            
-    if not found:
-        st.warning("عذراً، العنصر غير موجود حالياً في أرشيف المكتبة الرقمية.")
-
-st.divider()
-st.subheader("➕ مساهمة الفريق في إثراء المكتبة")
-new_item = st.text_input("اسم العنصر التراثي الجديد:")
-new_desc = st.text_area("وصف العنصر:")
-if st.button("إضافة للمكتبة"):
-    if new_item and new_desc:
-        heritage_db[new_item] = new_desc
-        st.success(f'تم بنجاح إضافة "{new_item}" إلى قاعدة بيانات المكتبة الرقمية!')
+if user_question:
+    with st.spinner("جاري البحث وصياغة الإجابة..."):
+        prompt = f"""
+        أنت خبير ومرشد ثقافي في المكتبة الرقمية للتراث السعودي.
+        أجب عن سؤال المستخدم بأسلوب شيق، دقيق، ومختصر باللغة العربية.
+        اعتمد في إجابتك أولاً على هذه البيانات الموثقة إن وجدت: {heritage_context}
+        سؤال المستخدم: {user_question}
+        """
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+        )
+        st.success("🤖 إجابة المساعد الثقافي:")
+        st.write(response.text)
