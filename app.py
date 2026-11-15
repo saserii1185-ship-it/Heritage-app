@@ -37,21 +37,30 @@ if prompt := st.chat_input("اكتب سؤالك أو استفسارك الترا
   with st.chat_message("user"):
     st.markdown(prompt)
 
-  # توليد الرد باستخدام نموذج جيميني
+  # توليد الرد بشكل فوري وسريع باستخدام Streaming
   with st.chat_message("assistant"):
-    with st.spinner("جاري البحث في الذاكرة التراثية..."):
-      try:
-        response = client.models.generate_content(
-            model="gemini-3.8-flash",
-            contents=(
-                "أنت مساعد ذكي متخصص في التراث والثقافة والتاريخ. أجب عن السؤال"
-                f" التالي باحترافية: {prompt}"
-            ),
-        )
-        answer = response.text
-        st.markdown(answer)
-        st.session_state.messages.append(
-            {"role": "assistant", "content": answer}
-        )
-      except Exception as e:
-        st.error(f"حدث خطأ أثناء الاتصال بالذكاء الاصطناعي: {e}")
+    try:
+      response_stream = client.models.generate_content_stream(
+          model="gemini-3.8-flash",
+          contents=(
+              "أنت مساعد ذكي متخصص في التراث والثقافة والتاريخ. أجب عن السؤال"
+              f" التالي باحترافية: {prompt}"
+          ),
+      )
+
+
+      # دالة لعرض الكلمات فور توليدها
+      def stream_generator():
+        for chunk in response_stream:
+          if chunk.text:
+            yield chunk.text
+
+
+      # عرض الرد وتخزين النص الكامل تلقائياً
+      full_response = st.write_stream(stream_generator())
+      st.session_state.messages.append(
+          {"role": "assistant", "content": full_response}
+      )
+
+    except Exception as e:
+      st.error(f"حدث خطأ أثناء الاتصال بالذكاء الاصطناعي: {e}")
