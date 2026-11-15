@@ -11,8 +11,7 @@ st.set_page_config(
 st.title("🏛️ موسوعة التراث والثقافة السعودية")
 st.write(
     "حيّاك الله! أنا مساعدك الذكي الشامل، جاهز آخذك في رحلة عبر تاريخ وثقافات"
-    " وعادات وتقاليد جميع مدن ومناطق المملكة العربية السعودية (من نجد، الحجاز،"
-    " عسير، الشرقية، الشمال، وغيرها)."
+    " وعادات وتقاليد جميع مدن ومناطق المملكة العربية السعودية."
 )
 
 # التحقق من وجود المفتاح في الـ Secrets
@@ -21,14 +20,11 @@ if "GEMINI_API_KEY" not in st.secrets:
       "الرجاء إضافة `GEMINI_API_KEY` في قسم الـ Secrets في إعدادات التطبيق."
   )
 else:
-  token = st.secrets["GEMINI_API_KEY"]
+  api_key = st.secrets["GEMINI_API_KEY"]
 
-  # رابط الاتصال المباشر
-  url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
-  headers = {
-      "Authorization": f"Bearer {token}",
-      "Content-Type": "application/json",
-  }
+  # إرسال المفتاح بالطريقة الصحيحة عبر الـ Query Parameter في الرابط
+  url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+  headers = {"Content-Type": "application/json"}
 
   # إدارة سجل المحادثة
   if "messages" not in st.session_state:
@@ -39,7 +35,7 @@ else:
     with st.chat_message(message["role"]):
       st.markdown(message["content"])
 
-    # صندوق الإدخال للمستخدم
+  # صندوق الإدخال للمستخدم
   if prompt := st.chat_input(
       "اسأل عن أي مدينة، تراث، عادات، أو تاريخ في المملكة..."
   ):
@@ -55,10 +51,9 @@ else:
           full_prompt = (
               "أنت مساعد ذكي خبير ومؤرخ متخصص في الثقافة، والتاريخ، والتراث،"
               " والفنون، والعادات، والتقاليد، وأمثال جميع مناطق ومدن المملكة"
-              " العربية السعودية (مثل نجد، الحجاز، عسير، المنطقة الشرقية،"
-              " الشمال، وغيرها). تتحدث بطريقة ودودة، قريبة للقلب، وبروح"
-              " سعودية أصيلة ومرحبة. تقدم معلومات دقيقة وغنية عن تراث أي مدخل"
-              " أو منطقة يسال عنها المستخدم. السؤال هو: " + prompt
+              " العربية السعودية. تتحدث بطريقة ودودة، قريبة للقلب، وبروح سعودية"
+              " أصيلة ومرحبة. تقدم معلومات دقيقة وغنية عن تراث أي مدينة أو"
+              " منطقة يسأل عنها المستخدم. السؤال هو: " + prompt
           )
 
           payload = {
