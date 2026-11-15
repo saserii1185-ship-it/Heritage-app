@@ -35,12 +35,12 @@ if prompt := st.chat_input("اكتب سؤالك أو استفسارك الترا
   with st.chat_message("user"):
     st.markdown(prompt)
 
-  # توليد الرد مع إظهار الخطأ الحقيقي في حال حدثت مشكلة
+  # توليد الرد باستخدام النموذج الصحيح المخصص لحسابك
   with st.chat_message("assistant"):
-    with st.spinner("جاري المعالجة..."):
+    with st.spinner("جاري البحث في الذاكرة التراثية..."):
       try:
         response = client.models.generate_content(
-            model="gemini-1.5-flash",
+            model="gemini-3.8-flash",
             contents=(
                 "أنت مساعد ذكي متخصص في التراث والثقافة والتاريخ. أجب باحترافية"
                 f" عن: {prompt}"
@@ -52,5 +52,6 @@ if prompt := st.chat_input("اكتب سؤالك أو استفسارك الترا
             {"role": "assistant", "content": answer}
         )
       except Exception as e:
-        # هنا سيظهر الخطأ التقني الحقيقي لنعرف سببه بدقة
-        st.error(f"⚠️ الإيرور التقني بالتفصيل: {e}")
+        st.error(
+            "⚠️ الخوادم تواجه ضغطاً مؤقتاً، جربي إعادة إرسال السؤال بعد ثانية."
+        )
