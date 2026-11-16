@@ -121,8 +121,8 @@ if prompt := st.chat_input("اسأل عن أي شيء محدد (مثلاً: أك
     st.markdown(prompt)
 
        with st.chat_message("assistant"):
-with st.spinner("جاري جلب العلوم الطيبة..."):
-      answer = get_cultural_response(prompt)
-                         st.markdown(answer)
- st.image("images/IMG_3128.jpeg", caption="تراثنا السعودي العريق")
- st.session_state.messages.append({"role": "assistant", "content": answer})
+    with st.spinner("...جاري جلب العلوم الطيبة"):
+        answer = get_cultural_response(prompt)
+        st.markdown(answer)
+        st.image("images/IMG_3128.jpeg", caption="تراثنا السعودي العريق", use_container_width=True)
+        st.session_state.messages.append({"role": "assistant", "content": answer})
