@@ -109,11 +109,6 @@ def get_cultural_response(query):
 * **الأكل:** المنسف الشمالي والأكلات البرية."""
       import streamlit as st
 
-st.title("مساعد التراث السعودي 🇸🇦")
-
-# لعرض الصورة من مجلد images
-st.image("images/اسم_الصورة.png", caption="تراثنا السعودي العريق")
-
   else:
     return f"""### 🏛️ أهلاً بك!
 سؤالك عن **"{query}"** منور المجلس. 
