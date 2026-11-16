@@ -123,5 +123,5 @@ if prompt := st.chat_input("أهلاً بك، اسألني عن أي منطقة 
     with st.chat_message("assistant"):
         answer = get_cultural_response(prompt)
         st.markdown(answer)
-        st.image("IMG_3128.jpeg", caption="تراثنا السعودي العريق")
+        st.image("IMG_1128.jpeg", caption="تراثنا السعودي العريق")
         st.session_state.messages.append({"role": "assistant", "content": answer})
