@@ -107,7 +107,6 @@ def get_cultural_response(query):
     return """### ⛰️ الشمال العريق
 * **التراث:** قلعة مارد في دومة الجندل، وأشجار الزيتون المعمرة.
 * **الأكل:** المنسف الشمالي والأكلات البرية."""
-      import streamlit as st
 
   else:
     return f"""### 🏛️ أهلاً بك!
@@ -128,5 +127,4 @@ if prompt := st.chat_input("اسأل عن أي شيء محدد (مثلاً: أك
         answer = get_cultural_response(prompt)
 st.markdown(answer)
 st.image("images/اسم_الصورة.png", caption="تراثنا السعودي العريق")
-
-      st.session_state.messages.append({"role": "assistant", "content": answer})
+ st.session_state.messages.append({"role": "assistant", "content": answer})
