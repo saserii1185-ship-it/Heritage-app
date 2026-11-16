@@ -115,14 +115,14 @@ def get_cultural_response(query):
 
 
 # صندوق الإدخال للمستخدم
-if prompt := st.chat_input("اسأل عن أي شيء محدد (مثلاً: أكل نجد، عمارة نجد)..."):
-  st.session_state.messages.append({"role": "user", "content": prompt})
-  with st.chat_message("user"):
-    st.markdown(prompt)
-
-       with st.chat_message("assistant"):
-    with st.spinner("...جاري جلب العلوم الطيبة"):
-        answer = get_cultural_response(prompt)
-        st.markdown(answer)
-        st.image("images/IMG_3128.jpeg", caption="تراثنا السعودي العريق", use_container_width=True)
-        st.session_state.messages.append({"role": "assistant", "content": answer})
+if prompt := st.chat_input("أهلاً بك، اسألني عن أي منطقة في المملكة..."):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    
+    with st.chat_message("assistant"):
+        with st.spinner("...جاري جلب العلوم الطيبة"):
+            answer = get_cultural_response(prompt)
+            st.markdown(answer)
+            st.image("images/IMG_3128.jpeg", caption="تراثنا السعودي العريق", use_container_width=True)
+            st.session_state.messages.append({"role": "assistant", "content": answer})
